@@ -7,6 +7,7 @@ import {TouchableOpacity} from 'react-native';
 import MainScreen from '../screens/MainScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 import ContactsScreen from '../screens/ContactsScreen';
+import CustomDrawer from "../components/CustomDrawer";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -37,7 +38,13 @@ const NewsStack = ({navigation}) => (
 
 export default function AppNavigator() {
     return (
-        <Drawer.Navigator id="MainDrawer">
+        <Drawer.Navigator id="MainDrawer"
+                          drawerContent={(props) => <CustomDrawer {...props} />}
+                          screenOptions={{
+                              drawerActiveTintColor: '#0D8ABC',
+                              drawerLabelStyle: { fontSize: 16 },
+                          }}
+        >
             <Drawer.Screen
                 name="NewsDrawer"
                 component={NewsStack}
