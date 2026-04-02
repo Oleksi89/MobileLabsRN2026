@@ -12,7 +12,7 @@ import { ThemeContext } from '../context/ThemeContext';
 const Tab = createBottomTabNavigator();
 
 export default function AppNavigator() {
-    const { isDarkTheme } = useContext(ThemeContext);
+    const {isDarkTheme } = useContext(ThemeContext);
     const themeColors = useTheme();
 
     const navigationTheme = isDarkTheme ? NavDarkTheme : DefaultTheme;
