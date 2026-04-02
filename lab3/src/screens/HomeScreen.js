@@ -1,58 +1,61 @@
-import React, { useContext, useState } from 'react';
-import { Dimensions } from 'react-native';
+import React, {useContext, useState} from 'react';
+import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withSpring,
     runOnJS
 } from 'react-native-reanimated';
-import { GameContext } from '../context/GameContext';
+import {GameContext} from '../context/GameContext';
 
+const {width, height} = Dimensions.get('window');
+const LIMIT_X = width / 2 - 40;
+const LIMIT_Y = height / 2 - 150;
 
 const Container = styled.View`
-  flex: 1;
-  background-color: ${props => props.theme.background};
-  align-items: center;
-  justify-content: center;
+    flex: 1;
+    background-color: ${props => props.theme.background};
+    align-items: center;
+    justify-content: center;
 `;
 
 const ScoreLabel = styled.Text`
-  font-size: 24px;
-  color: ${props => props.theme.textSecondary};
-  margin-bottom: 5px;
+    font-size: 24px;
+    color: ${props => props.theme.textSecondary};
+    margin-bottom: 5px;
 `;
 
 const ScoreValue = styled.Text`
-  font-size: 64px;
-  font-weight: bold;
-  color: ${props => props.theme.primary};
-  margin-bottom: 50px;
+    font-size: 64px;
+    font-weight: bold;
+    color: ${props => props.theme.primary};
+    margin-bottom: 50px;
 `;
 
 const ClickerObject = styled(Animated.View)`
-  width: 150px;
-  height: 150px;
-  border-radius: 75px;
-  background-color: ${props => props.theme.primary};
-  align-items: center;
-  justify-content: center;
-  elevation: 25;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.45;
-  shadow-radius: 3.84px;
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    background-color: ${props => props.theme.primary};
+    align-items: center;
+    justify-content: center;
+    elevation: 25;
+    shadow-color: #000;
+    shadow-offset: 0px 4px;
+    shadow-opacity: 0.45;
+    shadow-radius: 3.84px;
 `;
 
 const ClickerText = styled.Text`
-  color: white;
-  font-weight: bold;
-  text-transform: uppercase;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
 `;
 
 export default function HomeScreen() {
-    const { score, addScore, updateTask } = useContext(GameContext);
+    const {score, addScore, updateTask} = useContext(GameContext);
 
     const scale = useSharedValue(1);
     const translateX = useSharedValue(0);
@@ -95,8 +98,12 @@ export default function HomeScreen() {
     // Перетягування (Pan)
     const panGesture = Gesture.Pan()
         .onUpdate((e) => {
-            translateX.value = savedTranslateX.value + e.translationX;
-            translateY.value = savedTranslateY.value + e.translationY;
+            const nextX = e.translationX + savedTranslateX.value;
+            const nextY = e.translationY + savedTranslateY.value;
+
+            translateX.value = Math.max(-LIMIT_X, Math.min(LIMIT_X, nextX));
+            translateY.value = Math.max(-LIMIT_Y, Math.min(LIMIT_Y, nextY));
+
         })
         .onEnd(() => {
             savedTranslateX.value = translateX.value;
@@ -132,9 +139,9 @@ export default function HomeScreen() {
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: translateX.value },
-            { translateY: translateY.value },
-            { scale: scale.value },
+            {translateX: translateX.value},
+            {translateY: translateY.value},
+            {scale: scale.value},
         ],
     }));
 

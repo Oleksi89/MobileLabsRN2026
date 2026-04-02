@@ -31,7 +31,16 @@ export const GameProvider = ({ children }) => {
     const addScore = (points) => {
         setScore(prev => {
             const newScore = prev + points;
-            updateTask('score100', newScore);
+            setTasks(prevTasks => prevTasks.map(task => {
+                if (task.id === 'score100') {
+                    return {
+                        ...task,
+                        current: newScore,
+                        completed: newScore >= task.target
+                    };
+                }
+                return task;
+            }));
             return newScore;
         });
     };
