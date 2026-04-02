@@ -35,22 +35,47 @@ const TaskProgress = styled.Text`
     margin-top: 4px;
 `;
 
+const taskIcons = {
+    tap10: 'fingerprint',
+    doubleTap5: 'gesture-double-tap',
+    longPress3s: 'clock-fast',
+    drag: 'hand-grabbing',
+    swipeRight: 'arrow-right-bold-circle-outline',
+    swipeLeft: 'arrow-left-bold-circle-outline',
+    resize: 'arrow-expand-all',
+    score100: 'trophy-outline',
+    customTask: 'star-circle-outline'
+};
+
+const IconWrapper = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: ${props => props.theme.primary + '20'};
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+`;
+
 export default function ChallengesScreen() {
     const {tasks} = useContext(GameContext);
 
     const renderItem = ({item}) => (
         <TaskItem completed={item.completed}>
+            <IconWrapper>
+                <MaterialCommunityIcons
+                    name={taskIcons[item.id] || 'checkbox-blank-circle-outline'}
+                    size={22}
+                    color={item.completed ? "#22c55e" : "#0ea5e9"}
+                />
+            </IconWrapper>
             <TaskInfo>
                 <TaskTitle>{item.title}</TaskTitle>
-                <TaskProgress>
-                    Прогрес: {item.current} / {item.target}
+                <TaskProgress completed={item.completed}>
+                    {item.completed ? 'Виконано!' : `Прогрес: ${item.current} / ${item.target}`}
                 </TaskProgress>
             </TaskInfo>
-            <MaterialCommunityIcons
-                name={item.completed ? "check-circle" : "circle-outline"}
-                size={24}
-                color={item.completed ? "#22c55e" : "#adb5bd"}
-            />
+            {item.completed && <MaterialCommunityIcons name="check-decagram" size={24} color="#22c55e" />}
         </TaskItem>
     );
 

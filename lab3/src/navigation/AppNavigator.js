@@ -8,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ChallengesScreen from '../screens/ChallengesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import { ThemeContext } from '../context/ThemeContext';
+import {TouchableOpacity} from "react-native";
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +34,11 @@ export default function AppNavigator() {
                 screenOptions={({ route }) => ({
                     tabBarActiveTintColor: themeColors.primary,
                     tabBarInactiveTintColor: themeColors.textSecondary,
+                    headerLeft: () => (
+                        <TouchableOpacity style={{ marginLeft: 15 }}>
+                            <MaterialCommunityIcons name="menu" size={24} color={themeColors.text} />
+                        </TouchableOpacity>
+                    ),
                     headerStyle: { backgroundColor: themeColors.card },
                     headerTitleStyle: { color: themeColors.text },
                     tabBarStyle: { backgroundColor: themeColors.card, borderTopColor: themeColors.border },

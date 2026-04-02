@@ -2,6 +2,7 @@ import React, {useContext, useState} from 'react';
 import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -35,24 +36,62 @@ const ScoreValue = styled.Text`
 `;
 
 const ClickerObject = styled(Animated.View)`
-    width: 150px;
-    height: 150px;
-    border-radius: 75px;
+    width: 160px;
+    height: 160px;
+    border-radius: 80px;
     background-color: ${props => props.theme.primary};
     align-items: center;
     justify-content: center;
-    elevation: 25;
-    shadow-color: #000;
-    shadow-offset: 0px 4px;
-    shadow-opacity: 0.45;
-    shadow-radius: 3.84px;
+    z-index: 10;
+    border-width: 4px;
+    border-color: #6e6e6e;
+    elevation: 15;
+    shadow-color: ${props => props.theme.primary};
+    shadow-offset: 0px 10px;
+    shadow-opacity: 0.5;
+    shadow-radius: 15px;
 `;
 
 const ClickerText = styled.Text`
     color: white;
-    font-weight: bold;
-    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 14px;
+    margin-top: 5px;
 `;
+
+const LegendContainer = styled.View`
+    background-color: ${props => props.theme.card};
+    padding: 20px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    width: 100%;
+    border-top-width: 1px;
+    border-color: ${props => props.theme.border};
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+`;
+
+const LegendItem = styled.View`
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+`;
+
+const LegendText = styled.Text`
+    color: ${props => props.theme.text};
+    font-size: 20px;
+    margin-left: 10px;
+    flex: 1;
+`;
+
+const Points = styled.Text`
+    color: ${props => props.theme.primary};
+    font-weight: bold;
+    font-size: 20px;
+`;
+
 
 export default function HomeScreen() {
     const {score, addScore, updateTask} = useContext(GameContext);
@@ -166,9 +205,33 @@ export default function HomeScreen() {
 
             <GestureDetector gesture={composedGestures}>
                 <ClickerObject style={animatedStyle}>
+                    <MaterialCommunityIcons name="gesture-tap" size={50} color="white"/>
                     <ClickerText>Tap / Pull</ClickerText>
                 </ClickerObject>
             </GestureDetector>
+
+            <LegendContainer>
+                <LegendItem>
+                    <MaterialCommunityIcons name="gesture-tap" size={18} color="#0ea5e9"/>
+                    <LegendText>Tap</LegendText>
+                    <Points>+1</Points>
+                </LegendItem>
+                <LegendItem>
+                    <MaterialCommunityIcons name="gesture-double-tap" size={18} color="#0ea5e9"/>
+                    <LegendText>Double Tap</LegendText>
+                    <Points>+2</Points>
+                </LegendItem>
+                <LegendItem>
+                    <MaterialCommunityIcons name="timer-sand" size={18} color="#0ea5e9"/>
+                    <LegendText>Long Press (3s)</LegendText>
+                    <Points>+5</Points>
+                </LegendItem>
+                <LegendItem>
+                    <MaterialCommunityIcons name="gesture-swipe" size={18} color="#0ea5e9"/>
+                    <LegendText>Swipe</LegendText>
+                    <Points>1-10</Points>
+                </LegendItem>
+            </LegendContainer>
         </Container>
     );
 }
