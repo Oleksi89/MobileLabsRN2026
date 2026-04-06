@@ -4,6 +4,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import {Ionicons} from '@expo/vector-icons';
 import FileListItem from '../components/FileListItem';
 import CreateItemModal from '../components/CreateItemModal';
+import StorageStats from "../components/StorageStats";
 
 const ROOT_DIR = FileSystem.documentDirectory;
 
@@ -11,20 +12,12 @@ export default function HomeScreen({navigation}) {
     const [currentPath, setCurrentPath] = useState(ROOT_DIR);
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [storageStats, setStorageStats] = useState({free: 0, total: 0, used: 0});
 
     const [modalVisible, setModalVisible] = useState(false);
     const [createType, setCreateType] = useState(null);
     const [inputName, setInputName] = useState('');
     const [fileContent, setFileContent] = useState('');
 
-    const formatBytes = (bytes) => {
-        if (!bytes) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
 
 
     const loadDirectory = useCallback(async (path) => {
@@ -131,7 +124,7 @@ export default function HomeScreen({navigation}) {
 
     return (
         <View style={styles.container}>
-
+            <StorageStats />
             <View style={styles.header}>
                 <TouchableOpacity onPress={goBack} disabled={currentPath === ROOT_DIR}>
                     <Ionicons name="arrow-back" size={24} color={currentPath === ROOT_DIR ? '#ccc' : '#000'}/>
