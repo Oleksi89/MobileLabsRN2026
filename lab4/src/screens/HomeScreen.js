@@ -68,7 +68,7 @@ export default function HomeScreen({ navigation }) {
         if (item.isDirectory) {
             setCurrentPath(item.uri + '/');
         } else {
-            // open file
+            navigation.navigate('FileDetail', { uri: item.uri, name: item.name });
         }
     };
 
