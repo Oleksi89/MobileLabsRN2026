@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView} from 'react-native';
-import * as FileSystem from 'expo-file-system/legacy';
+import { File } from 'expo-file-system';
 
 export default function FileDetailScreen({route, navigation}) {
     const {uri, name} = route.params;
@@ -14,17 +14,17 @@ export default function FileDetailScreen({route, navigation}) {
 
     const fetchFileDetails = async () => {
         try {
-            const info = await FileSystem.getInfoAsync(uri);
+            const file = new File(uri);
             let fileContent = '';
 
-            if (name.endsWith('.txt')) {
-                fileContent = await FileSystem.readAsStringAsync(uri, {encoding: FileSystem.EncodingType.UTF8});
+            if (file.name.endsWith('.txt')) {
+                fileContent = await file.text();
             }
 
             setDetails({
-                size: info.size,
-                modificationTime: new Date(info.modificationTime * 1000).toLocaleString('uk-UA'),
-                extension: name.includes('.') ? name.split('.').pop() : 'Невідомо'
+                size: file.size,
+                modificationTime: new Date(file.modificationTime).toLocaleString('uk-UA'),
+                extension: file.extension || (file.name.includes('.') ? file.name.split('.').pop() : 'Невідомо')
             });
             setContent(fileContent);
         } catch (error) {
@@ -37,7 +37,8 @@ export default function FileDetailScreen({route, navigation}) {
 
     const handleSave = async () => {
         try {
-            await FileSystem.writeAsStringAsync(uri, content, {encoding: FileSystem.EncodingType.UTF8});
+            const file = new File(uri);
+            await file.write(content);
             Alert.alert('Успіх', 'Зміни збережено');
         } catch (error) {
             Alert.alert('Помилка', 'Не вдалося зберегти файл');

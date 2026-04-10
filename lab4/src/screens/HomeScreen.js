@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View, FlatList, Text, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
-import * as FileSystem from 'expo-file-system/legacy';
+import { Paths, Directory, File } from 'expo-file-system';
 import {Ionicons} from '@expo/vector-icons';
 import FileListItem from '../components/FileListItem';
 import CreateItemModal from '../components/CreateItemModal';
 import StorageStats from "../components/StorageStats";
 
-const ROOT_DIR = FileSystem.documentDirectory;
+const ROOT_DIR = Paths.document.uri;
 
 export default function HomeScreen({navigation}) {
     const [currentPath, setCurrentPath] = useState(ROOT_DIR);
@@ -18,19 +18,20 @@ export default function HomeScreen({navigation}) {
     const [inputName, setInputName] = useState('');
     const [fileContent, setFileContent] = useState('');
 
-
-
-    const loadDirectory = useCallback(async (path) => {
+    const loadDirectory = useCallback(async (pathUri) => {
         setLoading(true);
         try {
-            const dirFiles = await FileSystem.readDirectoryAsync(path);
-            const fileInfos = await Promise.all(
-                dirFiles.map(async (fileName) => {
-                    const fileUri = path + fileName;
-                    const info = await FileSystem.getInfoAsync(fileUri);
-                    return {name: fileName, uri: fileUri, isDirectory: info.isDirectory};
-                })
-            );
+            const currentDir = new Directory(pathUri);
+            const contents = currentDir.list(); // Синхронно повертає масив об'єктів File та Directory
+
+            const fileInfos = contents.map((item) => {
+                const isDirectory = item instanceof Directory;
+                return {
+                    name: item.name,
+                    uri: item.uri,
+                    isDirectory
+                };
+            });
 
             fileInfos.sort((a, b) => {
                 if (a.isDirectory && !b.isDirectory) return -1;
@@ -59,7 +60,7 @@ export default function HomeScreen({navigation}) {
 
     const handlePressItem = (item) => {
         if (item.isDirectory) {
-            setCurrentPath(item.uri + '/');
+            setCurrentPath(item.uri);
         } else {
             navigation.navigate('FileDetail', {uri: item.uri, name: item.name});
         }
@@ -76,7 +77,13 @@ export default function HomeScreen({navigation}) {
                     style: 'destructive',
                     onPress: async () => {
                         try {
-                            await FileSystem.deleteAsync(item.uri);
+                            if (item.isDirectory) {
+                                const dir = new Directory(item.uri);
+                                await dir.delete();
+                            } else {
+                                const file = new File(item.uri);
+                                await file.delete();
+                            }
                             loadDirectory(currentPath);
                         } catch (error) {
                             Alert.alert('Помилка', 'Не вдалося видалити об\'єкт');
@@ -90,8 +97,9 @@ export default function HomeScreen({navigation}) {
     const goBack = () => {
         if (currentPath === ROOT_DIR) return;
 
-        const cleanPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
-        let newPath = cleanPath.substring(0, cleanPath.lastIndexOf('/') + 1);
+        // Використовуємо властивість parentDirectory нового API замість розрізання строк
+        const currentDir = new Directory(currentPath);
+        let newPath = currentDir.parentDirectory?.uri || ROOT_DIR;
 
         if (!newPath.startsWith(ROOT_DIR) || newPath.length < ROOT_DIR.length) {
             newPath = ROOT_DIR;
@@ -106,15 +114,18 @@ export default function HomeScreen({navigation}) {
             return;
         }
 
-        const uri = currentPath + inputName.trim();
-
         try {
+            const parentDir = new Directory(currentPath);
+
             if (createType === 'folder') {
-                await FileSystem.makeDirectoryAsync(uri, {intermediates: true});
+                const newDir = new Directory(parentDir, inputName.trim());
+                await newDir.create();
             } else if (createType === 'file') {
-                const fullUri = uri.endsWith('.txt') ? uri : uri + '.txt';
-                await FileSystem.writeAsStringAsync(fullUri, fileContent, {encoding: FileSystem.EncodingType.UTF8});
+                const fileName = inputName.trim().endsWith('.txt') ? inputName.trim() : inputName.trim() + '.txt';
+                const newFile = new File(parentDir, fileName);
+                await newFile.write(fileContent || ''); // Відразу записуємо вміст
             }
+
             setModalVisible(false);
             loadDirectory(currentPath);
         } catch (error) {
