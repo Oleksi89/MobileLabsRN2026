@@ -61,6 +61,9 @@ export default function LoginScreen() {
             <Link href="/register" style={styles.link}>
                 Немає акаунту? Зареєструватися
             </Link>
+            <Link href="/reset" style={styles.link}>
+                Забули пароль?
+            </Link>
             <Link href="/falselink" style={styles.link}>
                 Неіснуюче посилання
             </Link>

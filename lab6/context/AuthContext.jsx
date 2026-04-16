@@ -4,7 +4,8 @@ import {
     createUserWithEmailAndPassword,
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    signOut as firebaseSignOut
+    signOut as firebaseSignOut,
+    sendPasswordResetEmail
 } from 'firebase/auth';
 import {doc, setDoc} from 'firebase/firestore'; // Імпорти для Firestore
 
@@ -43,8 +44,15 @@ export const AuthProvider = ({children}) => {
         await firebaseSignOut(auth);
     };
 
+    const resetPassword = async (email) => {
+        await sendPasswordResetEmail(auth, email);
+    };
+
     return (
-        <AuthContext.Provider value={{isAuthenticated, user, isLoading, login, register, logout}}>
+        <AuthContext.Provider value={{
+            isAuthenticated, user, isLoading, login, register, logout,
+            resetPassword
+        }}>
             {!isLoading && children}
         </AuthContext.Provider>
     );
