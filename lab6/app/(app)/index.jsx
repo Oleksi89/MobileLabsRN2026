@@ -5,7 +5,7 @@ import {PRODUCTS} from '../../data/products';
 import {useAuth} from '../../context/AuthContext';
 
 export default function CatalogScreen() {
-    const {logout} = useAuth();
+    const { logout, user } = useAuth();
 
     const renderItem = ({item}) => (
         <Link
@@ -27,6 +27,11 @@ export default function CatalogScreen() {
 
     return (
         <View style={styles.container}>
+            <View style={styles.profileHeader}>
+                <Text style={styles.profileText}>Логін: {user?.email || 'Завантаження...'}</Text>
+                <Text style={styles.profileSubText}>ID: {user?.uid || '---'}</Text>
+            </View>
+
             <FlatList
                 data={PRODUCTS}
                 keyExtractor={(item) => item.id}
@@ -42,6 +47,7 @@ export default function CatalogScreen() {
 
 const styles = StyleSheet.create({
     container: {flex: 1, backgroundColor: '#f5f5f5'},
+    profileHeader: { backgroundColor: '#007AFF', padding: 15, alignItems: 'center' },
     list: {padding: 15},
     card: {
         flexDirection: 'row',
