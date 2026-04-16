@@ -1,50 +1,53 @@
-# Welcome to your Expo app 👋
+# Лабораторна робота №5: Навігація в React Native (Expo Router)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## 1. Інструкція із запуску
 
-## Get started
+1. Клонувати репозиторій.
+2. Встановити залежності: `npm install`.
+3. Запустити сервер розробки: `npx expo start`.
 
-1. Install dependencies
+### Способи запуску мобільного додатка
 
-   ```bash
-   npm install
-   ```
+* **Expo Go (Фізичний пристрій):** Встановіть додаток Expo Go на свій смартфон. Відскануйте QR-код з терміналу. Цей
+  спосіб найшвидший для тестування на реальному залізі без підключення кабелів. Обмеження: не підтримує нативні модулі,
+  які не входять до складу Expo SDK.
+* **Android Emulator:** Вимагає встановленого Android Studio та налаштованого Virtual Device. Після
+  запуску `npx expo start`, натисніть `a` у терміналі. Дозволяє тестувати додаток на різних версіях Android та
+  роздільних здатностях екрану без фізичного пристрою.
+* **Web-версія:** Натисніть `w` у терміналі після запуску. Зручно для швидкої перевірки верстки, але не відображає
+  специфічну поведінку мобільних платформ.
 
-2. Start the app
+## 2. Опис функціоналу
 
-   ```bash
-   npx expo start
-   ```
+- **Auth Context**: Глобальне керування станом авторизації (login, register, logout).
+- **Protected Routes**: Група `(app)` доступна лише авторизованим користувачам; автоматичне перенаправлення
+  неавторизованих у групу `(auth)`.
+- **Каталог товарів**: Відображення списку об'єктів за допомогою `FlatList` з кастомними картками.
+- **Динамічна навігація**: Екран деталей товару з отриманням параметрів через `useLocalSearchParams`.
+- **Error Handling**: Обробка неіснуючих маршрутів через `+not-found`.
 
-In the output, you'll find options to open the app in a
+## 3. Скріншоти роботи
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Екран входу**:
+  <img src="./assets/screenshots/login.png" width="300" />
+- **Екран реєстрації**:
+  <img src="./assets/screenshots/register.png" width="300" />
+- **Каталог товарів**:
+  <img src="./assets/screenshots/catalog.png" width="300" />
+- **Деталі товару**:
+  <img src="./assets/screenshots/details.png" width="300" />
+- **Помилка 404**:
+  <img src="./assets/screenshots/not_found.png" width="300" />
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 4. Висновки (Відповіді на контрольні запитання)
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. **Перенаправлення**: Реалізується перевіркою стану в `_layout.jsx` відповідної групи.
+   Якщо `isAuthenticated === false`, компонент повертає `<Redirect href="/login" />`.
+2. **Link та router.push()**: `<Link>` - декларативний компонент (краще для доступності та SEO на
+   web), `router.push()` - метод для програмного переходу (наприклад, після виклику функції).
+3. **Динамічні маршрути**: Створюються за допомогою файлів із назвою в квадратних дужках, наприклад `[id].jsx`.
+   Параметри отримуються через хук `useLocalSearchParams()`.
+4. **React Context**: Дозволяє уникнути "prop drilling" та забезпечує синхронний доступ до стану авторизації з
+   будь-якого рівня вкладеності екранів та макетів.
+5. **Групи маршрутів**: Використовуються для логічного групування файлів (наприклад, `(auth)` та `(app)`). Вони не
+   впливають на URL-адресу, дозволяють створювати окремі макети (`_layout.jsx`) для різних частин додатку.
