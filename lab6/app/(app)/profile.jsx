@@ -3,12 +3,16 @@ import {View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert} fro
 import {doc, getDoc, setDoc} from 'firebase/firestore'; // Замінили updateDoc на setDoc
 import {db} from '../../config/firebase';
 import {useAuth} from '../../context/AuthContext';
+import { EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'firebase/auth';
+import { deleteDoc } from 'firebase/firestore';
 
 export default function ProfileScreen() {
     const {user} = useAuth();
     const [profileData, setProfileData] = useState({name: '', age: '', city: ''});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [password, setPassword] = useState('');
+    const [deleting, setDeleting] = useState(false);
 
     // Завантаження даних з Firestore
     useEffect(() => {
@@ -59,6 +63,45 @@ export default function ProfileScreen() {
         }
     };
 
+
+    const handleDeleteAccount = async () => {
+        if (!password) {
+            Alert.alert('Помилка', 'Для видалення акаунту необхідно ввести поточний пароль');
+            return;
+        }
+
+        Alert.alert(
+            'Видалення акаунту',
+            'Ви впевнені? Цю дію неможливо скасувати.',
+            [
+                { text: 'Скасувати', style: 'cancel' },
+                {
+                    text: 'Видалити',
+                    style: 'destructive',
+                    onPress: async () => {
+                        setDeleting(true);
+                        try {
+                            // 1. Повторна автентифікація
+                            const credential = EmailAuthProvider.credential(user.email, password);
+                            await reauthenticateWithCredential(user, credential);
+
+                            // 2. Видалення документа з Firestore
+                            await deleteDoc(doc(db, 'users', user.uid));
+
+                            // 3. Видалення користувача з Firebase Auth
+                            await deleteUser(user);
+
+                            // Context автоматично перекине на /login завдяки слухачу onAuthStateChanged
+                        } catch (error) {
+                            Alert.alert('Помилка видалення', 'Перевірте правильність паролю.');
+                            setDeleting(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     if (loading) {
         return <ActivityIndicator size="large" color="#007AFF" style={styles.loader}/>;
     }
@@ -95,12 +138,29 @@ export default function ProfileScreen() {
             ) : (
                 <Button title="Зберегти зміни" onPress={handleUpdate}/>
             )}
+            <View style={styles.deleteSection}>
+                <Text style={styles.deleteTitle}>Небезпечна зона</Text>
+                <TextInput
+                    style={styles.input}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Введіть пароль для видалення"
+                    secureTextEntry
+                />
+                {deleting ? (
+                    <ActivityIndicator size="small" color="red" />
+                ) : (
+                    <Button title="Видалити акаунт" color="red" onPress={handleDeleteAccount} />
+                )}
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {flex: 1, padding: 20, backgroundColor: '#fff'},
+    deleteSection: { marginTop: 40, paddingTop: 20, borderTopWidth: 1, borderColor: '#eee' },
+    deleteTitle: { fontSize: 18, fontWeight: 'bold', color: 'red', marginBottom: 15 },
     loader: {flex: 1, justifyContent: 'center'},
     label: {fontSize: 16, fontWeight: 'bold', marginBottom: 5, color: '#333'},
     input: {borderWidth: 1, borderColor: '#ccc', padding: 12, marginBottom: 20, borderRadius: 8}
