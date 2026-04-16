@@ -30,7 +30,7 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
             />
-            <Button title="Увійти" onPress={() => login(email, password)}/>
+            <Button title="Увійти" onPress={handleLogin}/>
             <Link href="/register" style={styles.link}>
                 Немає акаунту? Зареєструватися
             </Link>

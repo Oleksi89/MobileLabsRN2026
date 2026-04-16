@@ -10,13 +10,20 @@ export default function AppLayout() {
         return <Redirect href="/login"/>;
     }
 
-    // If authorized, show child screens via Stack
+    // If authorized
     return (
         <Stack>
             <Stack.Screen
                 name="index"
                 options={{
                     title: 'Каталог товарів',
+                    headerTitleAlign: 'center'
+                }}
+            />
+            <Stack.Screen
+                name="details/[id]"
+                options={{
+                    title: 'Деталі товару',
                     headerTitleAlign: 'center'
                 }}
             />

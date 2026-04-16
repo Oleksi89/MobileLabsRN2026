@@ -8,7 +8,13 @@ export default function CatalogScreen() {
     const {logout} = useAuth();
 
     const renderItem = ({item}) => (
-        <Link href={`/details?id=${item.id}`} asChild>
+        <Link
+            href={{
+                pathname: "/details/[id]",
+                params: {id: item.id}
+            }}
+            asChild
+        >
             <TouchableOpacity style={styles.card}>
                 <Image source={{uri: item.imageUrl}} style={styles.image}/>
                 <View style={styles.info}>
