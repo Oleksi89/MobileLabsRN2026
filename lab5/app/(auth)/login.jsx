@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Link, router} from 'expo-router';
 import {useAuth} from '../../context/AuthContext';
 
@@ -15,7 +16,7 @@ export default function LoginScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Вхід</Text>
             <TextInput
                 style={styles.input}
@@ -34,7 +35,10 @@ export default function LoginScreen() {
             <Link href="/register" style={styles.link}>
                 Немає акаунту? Зареєструватися
             </Link>
-        </View>
+            <Link href="/falselink" style={styles.link}>
+                Неіснуюче посилання
+            </Link>
+        </SafeAreaView>
     );
 }
 

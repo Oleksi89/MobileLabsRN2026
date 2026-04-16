@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
 import {Link} from 'expo-router';
 import {useAuth} from '../../context/AuthContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
     const [name, setName] = useState('');
@@ -11,7 +12,7 @@ export default function RegisterScreen() {
     const {register} = useAuth();
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Реєстрація</Text>
             <TextInput style={styles.input} placeholder="Ім'я" value={name} onChangeText={setName}/>
             <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail}/>
@@ -28,7 +29,7 @@ export default function RegisterScreen() {
             <Link href="/login" style={styles.link}>
                 Вже є акаунт? Увійти
             </Link>
-        </View>
+        </SafeAreaView>
     );
 }
 
