@@ -1,12 +1,18 @@
 import React, {useState} from 'react';
 import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
-import {Link} from 'expo-router';
+import {Link, router} from 'expo-router';
 import {useAuth} from '../../context/AuthContext';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const {login} = useAuth();
+
+    const handleLogin = () => {
+        login(email, password);
+        // Force redirection for instant response
+        router.replace('/(app)');
+    };
 
     return (
         <View style={styles.container}>
