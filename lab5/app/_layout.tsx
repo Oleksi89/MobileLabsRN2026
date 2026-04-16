@@ -1,8 +1,10 @@
-import {Navigator, Stack} from "expo-router";
-import Slot = Navigator.Slot;
+import {Slot} from "expo-router";
+import {AuthProvider} from "@/context/AuthContext";
 
 export default function RootLayout() {
-  <AuthProvider>
-    <Slot />
-  </AuthProvider>
+  return (
+      <AuthProvider>
+        <Slot />
+      </AuthProvider>
+  );
 }
