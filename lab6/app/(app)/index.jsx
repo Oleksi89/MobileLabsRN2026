@@ -30,6 +30,10 @@ export default function CatalogScreen() {
             <View style={styles.profileHeader}>
                 <Text style={styles.profileText}>Логін: {user?.email || 'Завантаження...'}</Text>
                 <Text style={styles.profileSubText}>ID: {user?.uid || '---'}</Text>
+
+                <Link href="/profile" style={{ marginTop: 10 }}>
+                    <Text style={{ color: '#fff', textDecorationLine: 'underline' }}>Редагувати профіль</Text>
+                </Link>
             </View>
 
             <FlatList
@@ -48,6 +52,8 @@ export default function CatalogScreen() {
 const styles = StyleSheet.create({
     container: {flex: 1, backgroundColor: '#f5f5f5'},
     profileHeader: { backgroundColor: '#007AFF', padding: 15, alignItems: 'center' },
+    profileText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+    profileSubText: { color: '#e0e0e0', fontSize: 12, marginTop: 4 },
     list: {padding: 15},
     card: {
         flexDirection: 'row',
