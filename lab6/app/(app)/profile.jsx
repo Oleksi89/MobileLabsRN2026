@@ -4,6 +4,7 @@ import {doc, getDoc, setDoc} from 'firebase/firestore'; // Замінили upda
 import {db} from '../../config/firebase';
 import {useAuth} from '../../context/AuthContext';
 import {deleteDoc} from 'firebase/firestore';
+import {Link} from "expo-router";
 
 export default function ProfileScreen() {
     const {user, deleteAccount, validateAccess, updateUserProfile} = useAuth();
@@ -95,6 +96,11 @@ export default function ProfileScreen() {
 
     return (
         <View style={styles.container}>
+            <View style={styles.profileHeader}>
+                <Text style={styles.profileText}>Логін: {user?.email || 'Завантаження...'}</Text>
+                <Text style={styles.profileSubText}>ID: {user?.uid || '---'}</Text>
+            </View>
+
             <Text style={styles.label}>Ім`я:</Text>
             <TextInput
                 style={styles.input}
@@ -146,6 +152,9 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
     container: {flex: 1, padding: 20, backgroundColor: '#fff'},
+    profileHeader: { backgroundColor: '#007AFF',marginBottom: 25, padding: 15, alignItems: 'center' },
+    profileText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+    profileSubText: { color: '#e0e0e0', fontSize: 12, marginTop: 4 },
     deleteSection: {marginTop: 40, paddingTop: 20, borderTopWidth: 1, borderColor: '#eee'},
     deleteTitle: {fontSize: 18, fontWeight: 'bold', color: 'red', marginBottom: 15},
     loader: {flex: 1, justifyContent: 'center'},
