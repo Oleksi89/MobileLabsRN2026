@@ -3,11 +3,10 @@ import {View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert} fro
 import {doc, getDoc, setDoc} from 'firebase/firestore'; // Замінили updateDoc на setDoc
 import {db} from '../../config/firebase';
 import {useAuth} from '../../context/AuthContext';
-import { EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'firebase/auth';
-import { deleteDoc } from 'firebase/firestore';
+import {deleteDoc} from 'firebase/firestore';
 
 export default function ProfileScreen() {
-    const {user} = useAuth();
+    const {user, deleteAccount, validateAccess, updateUserProfile} = useAuth();
     const [profileData, setProfileData] = useState({name: '', age: '', city: ''});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -47,13 +46,11 @@ export default function ProfileScreen() {
         if (!user) return;
         setSaving(true);
         try {
-            const docRef = doc(db, 'users', user.uid);
-            // Використовуємо setDoc з merge: true. Це вирішує проблему "документ не знайдено"
-            await setDoc(docRef, {
+            await updateUserProfile(user.uid, {
                 name: profileData.name,
                 age: profileData.age,
                 city: profileData.city
-            }, {merge: true});
+            });
 
             Alert.alert('Успіх', 'Дані профілю успішно збережено');
         } catch (error) {
@@ -74,26 +71,16 @@ export default function ProfileScreen() {
             'Видалення акаунту',
             'Ви впевнені? Цю дію неможливо скасувати.',
             [
-                { text: 'Скасувати', style: 'cancel' },
+                {text: 'Скасувати', style: 'cancel'},
                 {
                     text: 'Видалити',
                     style: 'destructive',
                     onPress: async () => {
                         setDeleting(true);
                         try {
-                            // 1. Повторна автентифікація
-                            const credential = EmailAuthProvider.credential(user.email, password);
-                            await reauthenticateWithCredential(user, credential);
-
-                            // 2. Видалення документа з Firestore
-                            await deleteDoc(doc(db, 'users', user.uid));
-
-                            // 3. Видалення користувача з Firebase Auth
-                            await deleteUser(user);
-
-                            // Context автоматично перекине на /login завдяки слухачу onAuthStateChanged
+                            await deleteAccount(password);
                         } catch (error) {
-                            Alert.alert('Помилка видалення', 'Перевірте правильність паролю.');
+                            Alert.alert('Помилка видалення', 'Перевірте правильність паролю або спробуйте пізніше.');
                             setDeleting(false);
                         }
                     }
@@ -148,9 +135,9 @@ export default function ProfileScreen() {
                     secureTextEntry
                 />
                 {deleting ? (
-                    <ActivityIndicator size="small" color="red" />
+                    <ActivityIndicator size="small" color="red"/>
                 ) : (
-                    <Button title="Видалити акаунт" color="red" onPress={handleDeleteAccount} />
+                    <Button title="Видалити акаунт" color="red" onPress={handleDeleteAccount}/>
                 )}
             </View>
         </View>
@@ -159,8 +146,8 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
     container: {flex: 1, padding: 20, backgroundColor: '#fff'},
-    deleteSection: { marginTop: 40, paddingTop: 20, borderTopWidth: 1, borderColor: '#eee' },
-    deleteTitle: { fontSize: 18, fontWeight: 'bold', color: 'red', marginBottom: 15 },
+    deleteSection: {marginTop: 40, paddingTop: 20, borderTopWidth: 1, borderColor: '#eee'},
+    deleteTitle: {fontSize: 18, fontWeight: 'bold', color: 'red', marginBottom: 15},
     loader: {flex: 1, justifyContent: 'center'},
     label: {fontSize: 16, fontWeight: 'bold', marginBottom: 5, color: '#333'},
     input: {borderWidth: 1, borderColor: '#ccc', padding: 12, marginBottom: 20, borderRadius: 8}

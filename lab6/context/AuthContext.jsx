@@ -1,13 +1,16 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
-import {auth, db} from '@/config/firebase'; // Обов'язково імпортуємо db
+import {auth, db} from '@/config/firebase';
 import {
     createUserWithEmailAndPassword,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut as firebaseSignOut,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    deleteUser
 } from 'firebase/auth';
-import {doc, setDoc} from 'firebase/firestore'; // Імпорти для Firestore
+import {doc, setDoc, deleteDoc} from 'firebase/firestore';
 
 const AuthContext = createContext({});
 
@@ -23,6 +26,13 @@ export const AuthProvider = ({children}) => {
             setIsLoading(false);
         });
     }, []);
+
+    // Client-side access validation
+    const validateAccess = (targetUid) => {
+        if (!user || user.uid !== targetUid) {
+            throw new Error("Відмовлено в доступі. Ви маєте право працювати лише з власним документом.");
+        }
+    };
 
     const login = async (email, password) => {
         await signInWithEmailAndPassword(auth, email, password);
@@ -45,13 +55,37 @@ export const AuthProvider = ({children}) => {
     };
 
     const resetPassword = async (email) => {
+        if (!user) throw new Error("Користувач не авторизований");
+
+        validateAccess(user.uid);
+
         await sendPasswordResetEmail(auth, email);
+    };
+
+    const updateUserProfile = async (uid, data) => {
+        validateAccess(uid);
+        const docRef = doc(db, 'users', uid);
+        await setDoc(docRef, data, {merge: true});
+    };
+
+    const deleteAccount = async (password) => {
+        if (!user) throw new Error("Користувач не авторизований");
+
+        validateAccess(user.uid);
+
+        const credential = EmailAuthProvider.credential(user.email, password);
+        await reauthenticateWithCredential(user, credential);
+
+        await deleteDoc(doc(db, 'users', user.uid));
+        await deleteUser(user);
     };
 
     return (
         <AuthContext.Provider value={{
-            isAuthenticated, user, isLoading, login, register, logout,
-            resetPassword
+            isAuthenticated, user, isLoading,
+            login, register, logout, resetPassword,
+            deleteAccount, validateAccess,
+            updateUserProfile
         }}>
             {!isLoading && children}
         </AuthContext.Provider>
