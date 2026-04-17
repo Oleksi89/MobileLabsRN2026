@@ -6,5 +6,5 @@
 2. [Lab 2 - Вкладена навігація та списки](lab2/)
 3. [Lab 3 - Жести та стилізація](lab3/)
 4. [Lab 4 - Файлова система](lab4/)
-5. [Lab 5 - ...](lab5/)
-6. [Lab 6 - ...](lab6/)
+5. [Lab 5 - Навігація в React Native (Expo Router)](lab5/)
+6. [Lab 6 - Авторизація та Firestore в React Native](lab6/)
